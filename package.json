@@ -1,0 +1,18 @@
+{
+  "name": "nodejs-mongodb-rest-api-login",
+  "version": "0.1.0",
+  "description": "A RESTful back-end login starter kit using Node.js, Express.js, and MongoDB",
+  "main": "app.js",
+  "scripts": {
+    "start": "nodemon app",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Ceferino Jose II",
+  "license": "MIT",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "body-parser": "^1.17.2",
+    "express": "^4.15.3",
+    "mongoose": "^4.10.8"
+  }
+}
