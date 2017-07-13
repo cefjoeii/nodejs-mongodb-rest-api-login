@@ -1,22 +1,63 @@
 const express = require('express');
 const router = express.Router();
-const UsersController = require('../controllers/users-controller');
+const User = require('../models/user');
 
 router.post('/register', (req, res) => {
 
-  // Can also be passed in as req.body directly but we're just paranoid
-  let newUser = {
-    name: req.body.name,
-    email: req.body.email,
-    username: req.body.username,
-    password: req.body.password
-  };
+  let name = req.body.name;
+  let email = req.body.email;
+  let username = req.body.username;
+  let password = req.body.password;
+  let passwordconfirm = req.body.passwordconfirm;
 
-  UsersController.addUser(newUser, (result) => {
-    res.json(result);
+  if (password !== passwordconfirm) {
+    res.status(400).json({ success: false, msg: 'Passwords do not match.' });
+    return;
+  }
+
+  let newUser = new User({
+    name: name,
+    email: email,
+    username: username,
+    password: password
   });
 
+  newUser.save((err) => {
+
+    if(err) {
+      if (err.errors) {
+
+        if (err.errors.name) {
+          res.status(400).json({ success: false, msg: err.errors.name.message });
+          return;
+        }
+
+        if (err.errors.email) {
+          res.status(400).json({ success: false, msg: err.errors.email.message });
+          return;
+        }
+
+        if (err.errors.username) {
+          res.status(400).json({ success: false, msg: err.errors.username.message });
+          return;
+        }
+
+        if (err.errors.password) {
+          res.status(400).json({ success: false, msg: err.errors.password.message });
+          return;
+        }
+
+        // Show failed if all else fails for some reasons
+        res.status(400).json( { success: false, msg: 'Failed to register.'});
+      }
+    }
+
+    else {
+      res.json({ success: true, msg: 'User successfully registered.' });
+    }
+  });
 });
+
 
 router.post('/login', (req, res) => {
 

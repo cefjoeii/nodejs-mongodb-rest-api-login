@@ -10,9 +10,12 @@
   "author": "Ceferino Jose II",
   "license": "MIT",
   "dependencies": {
-    "bcryptjs": "^2.4.3",
+    "bcrypt-nodejs": "0.0.3",
     "body-parser": "^1.17.2",
     "express": "^4.15.3",
-    "mongoose": "^4.10.8"
+    "mongoose": "^4.10.8",
+    "mongoose-title-case": "0.0.4",
+    "mongoose-unique-validator": "^1.0.5",
+    "mongoose-validator": "^1.3.2"
   }
 }
