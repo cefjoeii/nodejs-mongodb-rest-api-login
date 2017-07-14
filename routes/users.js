@@ -1,25 +1,23 @@
 const express = require('express');
 const router = express.Router();
+const bcrypt = require('bcrypt-nodejs');
+const passport = require('passport');
+const jwt = require('jsonwebtoken');
+const config = require('../config/db');
 const User = require('../models/user');
 
 router.post('/register', (req, res) => {
 
-  let name = req.body.name;
-  let email = req.body.email;
-  let username = req.body.username;
-  let password = req.body.password;
-  let passwordconfirm = req.body.passwordconfirm;
-
-  if (password !== passwordconfirm) {
+  if (req.body.password !== req.body.passwordconfirm) {
     res.status(400).json({ success: false, msg: 'Passwords do not match.' });
     return;
   }
 
   let newUser = new User({
-    name: name,
-    email: email,
-    username: username,
-    password: password
+    name: req.body.name,
+    email: req.body.email,
+    username: req.body.username,
+    password: req.body.password
   });
 
   newUser.save((err) => {
@@ -64,29 +62,45 @@ router.post('/login', (req, res) => {
   const username = req.body.username;
   const password = req.body.password;
 
-  UsersController.getUserByUsername(username, (err, user) => {
+  User.findOne({ username: username }, (err, user) => {
 
     if (err) throw err;
 
     if (!user) {
-      // If return is not explicitly written, an error shows | SMH
       return res.status(400).json({ success: false, msg: 'User not found.' });
     }
-    
-    UsersController.comparePassword(password, user.password, (err, isMatch) => {
+
+    bcrypt.compare(password, user.password, function(err, isMatch) {
       if (err) throw err;
+      
       if (isMatch) {
-        // JSON Web Tokens handling is gonna go here later on
-        res.json({ success: true, msg: 'Successfully logged in!'});
+
+        const token = jwt.sign(user, config.secret, {
+          expiresIn: 604800 // 1 week
+        });
+
+        // Don't include the password in the returned user object
+        return res.json({
+          success: true,
+          token: 'JWT ' + token,
+          user: {
+            id: user._id,
+            name: user.name,
+            email: user.email,
+            username: user.username
+          }
+        });
       }
       else {
-        // Set the status code to 400, a bad request
-        res.status(400).json({ success: false, msg: 'Wrong password.'});
+        return res.status(400).json({ success: false, msg: 'Wrong password.' });
       }
     });
-
   });
 
 });
+
+router.get('/profile', passport.authenticate('jwt', { session: false }), (req, res) => {
+  res.json({ user: req.user });
+})
 
 module.exports = router;
