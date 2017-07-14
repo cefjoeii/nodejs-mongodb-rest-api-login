@@ -8,7 +8,7 @@ const config = require('../config/db');
 const nameValidator = [
   validate({
     validator: 'isLength',
-    arguments: [0, 35],
+    arguments: [0, 40],
     message: 'Name must not exceed {ARGS[1]} characters.'
   })
 ];
@@ -16,7 +16,7 @@ const nameValidator = [
 const emailValidator = [
   validate({
     validator: 'isLength',
-    arguments: [0, 35],
+    arguments: [0, 40],
     message: 'Email must not exceed {ARGS[1]} characters.'
   }),
   validate({
